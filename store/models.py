@@ -1,8 +1,9 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
-    discount = models.FloatField()
+    discount = models.FloatField(validators=[MinValueValidator(1,message='Discount Price should be positive')])
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
@@ -16,12 +17,13 @@ class Collection(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    unit_price = models.DecimalField(max_digits=6,decimal_places=2)
-    inventory = models.IntegerField()
+    slug = models.SlugField()
+    description = models.TextField(null=True)
+    unit_price = models.DecimalField(max_digits=6,decimal_places=2,validators=[MinValueValidator(1,message='Price should be positive number')])
+    inventory = models.IntegerField(validators=[MinValueValidator(1,message='Inventory should be greater or equal to 1')])
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection,on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion)
+    promotions = models.ManyToManyField(Promotion,blank=True)
 
     def __str__(self):
         return self.title
@@ -70,8 +72,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order,on_delete=models.PROTECT)
     product = models.ForeignKey(Product,on_delete=models.PROTECT)
-    quantity = models.PositiveSmallIntegerField()
-    unit_price = models.DecimalField(max_digits=6,decimal_places=2)
+    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(0,message='Quantity should be non-negative number')])
+    unit_price = models.DecimalField(max_digits=6,decimal_places=2,validators=[MinValueValidator(1,message='Price should be positive number')])
 
 
 class Address(models.Model):
@@ -85,7 +87,7 @@ class Cart(models.Model):
 class CartIteam(models.Model):
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
-    quantity = models.PositiveSmallIntegerField()
+    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1,message='Quantity should be positive number')])
 
 
 
