@@ -17,9 +17,9 @@ class Collection(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(null = True)
     description = models.TextField(null=True)
-    unit_price = models.DecimalField(max_digits=6,decimal_places=2,validators=[MinValueValidator(1,message='Price should be positive number')])
+    unit_price = models.DecimalField(default=1,max_digits=6,decimal_places=2,validators=[MinValueValidator(1,message='Price should be positive number')])
     inventory = models.IntegerField(validators=[MinValueValidator(1,message='Inventory should be greater or equal to 1')])
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection,on_delete=models.PROTECT,related_name='products')
@@ -62,7 +62,7 @@ class Order(models.Model):
         (PAYMENT_STATUS_FAILED,'Failed'),
         (PAYMENT_STATUS_COMPLETE,'Complete')
     ]
-    placed_at = models.DateTimeField(auto_now_add=True)
+    placed_at = models.DateTimeField(auto_now_add=True,null=True)
     payment_status = models.CharField(max_length=1,choices=PAYMENT_STATUS_CHOICES,default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
 
@@ -70,8 +70,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order,on_delete=models.PROTECT)
     product = models.ForeignKey(Product,on_delete=models.PROTECT,related_name='orderitems')
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(0,message='Quantity should be non-negative number')])
-    unit_price = models.DecimalField(max_digits=6,decimal_places=2,validators=[MinValueValidator(1,message='Price should be positive number')])
-
+    unit_price = models.DecimalField(default=1,max_digits=6,decimal_places=2,validators=[MinValueValidator(1,message='Price should be positive number')])
 
 class Address(models.Model):
     street = models.CharField(max_length=255)
@@ -86,6 +85,11 @@ class CartIteam(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1,message='Quantity should be positive number')])
 
-
+class Review(models.Model):
+    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
+    name =  models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField()
+    date = models.DateField(auto_now_add=True)
+    
 
     
