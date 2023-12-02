@@ -8,6 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 from .models import Product,Collection,OrderItem,Review
 from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
 from .filter import ProductFilter
+from .pagination import DefalutPagination
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -16,6 +17,7 @@ class ProductViewSet(ModelViewSet):
     filterset_class = ProductFilter
     search_fields = ['title','description']
     ordering_fields = ['unit_price','last_update']
+    pagination_class = DefalutPagination
 
     def get_serializer_context(self):
         return {"request":self.request}
