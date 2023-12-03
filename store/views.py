@@ -4,9 +4,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import SearchFilter,OrderingFilter
-from rest_framework.viewsets import ModelViewSet
-from .models import Product,Collection,OrderItem,Review
-from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.viewsets import ModelViewSet,GenericViewSet
+from .models import Product,Collection,OrderItem,Review,Cart
+from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer
 from .filter import ProductFilter
 from .pagination import DefalutPagination
 
@@ -38,7 +39,8 @@ class CollectionViewSet(ModelViewSet):
             return Response({'error':'Collection can not be deleted it is associated with products'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -49,3 +51,7 @@ class ReviewViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'product_id':self.kwargs['product_pk']}
         
+
+class CartViewSet(CreateModelMixin,GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
