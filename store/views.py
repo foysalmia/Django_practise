@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import SearchFilter,OrderingFilter
-from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin
+from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from .models import Product,Collection,OrderItem,Review,Cart,CartIteam
 from .serializers import *
@@ -71,3 +71,6 @@ class CartItemViewSet(ModelViewSet):
     def get_queryset(self):
         return CartIteam.objects.filter(cart_id = self.kwargs['cart_pk']).select_related('product')
     
+class CustomerViewSet(CreateModelMixin,RetrieveModelMixin,UpdateModelMixin,GenericViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
